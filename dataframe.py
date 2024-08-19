@@ -30,7 +30,7 @@ def dataframe_read(file):
     return df_comp, None  # Ensure two values are returned
 
 def sort_col(df, count):
-    selected_columns = ['Model.Suffix', 'Seq.', 'Lvl', 'Part No', 'Supply Type', 'Desc.', 'Spec.', 'Class Code', 'Class Name', 'Material Cost (KRW)', 'Material Cost (USD)', 'Curr (All)', 'Exchange Rate (All)']
+    selected_columns = ['Model.Suffix', 'Seq.', 'Lvl', 'UIT', 'Part No', 'Supply Type', 'Desc.', 'Spec.', 'Class Code', 'Class Name', 'Material Cost (KRW)', 'Material Cost (USD)', 'Curr (All)', 'Exchange Rate (All)']
     df_col = df[selected_columns]
     df_col['Code_3'] = df_col['Class Code'].str[:3]
 
@@ -54,6 +54,7 @@ def add_cols(df_comp, count):
     df_comp['Lvl'] = df_comp['Lvl'].fillna(0).astype(int)
 
     if count == 0:
+        uit_rows(df_comp)
         level_sum(df_comp)
         return None, None  # Ensure two values are returned
     else:
@@ -136,4 +137,27 @@ def total_sum(final_df):
 def highlight_sum_rows(row):
     return ['background-color: lightblue' if 'Sum' in str(cell) else '' for cell in row]
 
+def uit_rows(df):
+    df = df[['분류','UIT','Part No','Desc.','Spec.','Material Cost (USD)']]
+    
+    # 'UIT'가 'M'인 행만 필터링
+    df_filtered = df[df['UIT'] == 'M']
 
+    # 정렬 ('Material Cost (USD)' 기준으로 오름차순 정렬)
+    df_sorted = df_filtered.sort_values(by='Material Cost (USD)')
+
+    # 'Material Cost (USD)' 값의 합계 계산
+    total_material_cost = df_sorted['Material Cost (USD)'].sum()
+    sum_row = pd.DataFrame({'분류': ['Labor_Sum'], 'Material Cost (USD)': [total_material_cost]})
+
+    # 합계 행을 df_sorted에 추가
+    df_sorted = pd.concat([df_sorted, sum_row ], ignore_index=True)
+    df_sorted = df_sorted.fillna('')
+    df_sorted['Material Cost (USD)'] = round(df_sorted['Material Cost (USD)'], 2)
+    df_UIT = df_sorted.drop('UIT', axis=1)
+    df_UIT.columns.values[4] = 'Labor Cost[$]'
+
+    # 데이터프레임을 HTML 테이블로 변환
+    global html_UIT_table
+    html_UIT_table = df_UIT.to_html(classes='table table-striped', index=False)
+    

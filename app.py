@@ -47,6 +47,7 @@ def submit():
             'result': 'Success',
             'html_table': dataframe.html_table,
             'html_table_tbd': file_save.html_table_tbd,
+            'html_UIT_table': dataframe.html_UIT_table,
             'image_url': url_for('uploaded_file', filename=image_filename)
         })
     except Exception as e:
