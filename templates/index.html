@@ -58,6 +58,13 @@
             z-index: 2;
             cursor: pointer;
         }
+
+        /* 숨겨진 다운로드 링크 */
+        #download-link {
+            display: none;
+            font-weight: bold;
+            color: green;
+        }
     </style>
     <script>
         // 파일 선택 시 파일명을 표시
@@ -73,12 +80,12 @@
                 reader.onload = function(event) {
                     fileData = event.target.result;
                 };
-                reader.readAsArrayBuffer(file);  // 파일 데이터를 메모리에 읽어옴
+                reader.readAsArrayBuffer(file); // 파일 데이터를 메모리에 읽어옴
             } else {
-                fileNameDisplay.innerText = '';  // 파일이 선택되지 않은 경우
+                fileNameDisplay.innerText = ''; // 파일이 선택되지 않은 경우
             }
         }
-
+        
         // 파일 데이터를 서버로 전송하고 파라미터 제출
         function handleParamSubmit() {
             const paramForm = document.getElementById('param-form');
@@ -121,6 +128,16 @@
                     const img = document.getElementById('result-image');
                     img.src = data.image_url;
                     img.style.display = 'block';
+
+                    // 파일 다운로드 링크 활성화
+                    const downloadLink = document.getElementById('download-link');
+                    downloadLink.href = `/download/${data.filename}`;
+                    downloadLink.style.display = 'inline';
+
+                    // 이미지 다운로드 링크 활성화
+                    const downloadImageLink = document.getElementById('download-image-link');
+                    downloadImageLink.href = `/download_image/${data.image_filename}`;
+                    downloadImageLink.style.display = 'inline';
                 } else {
                     alert(data.result);
                 }
@@ -129,7 +146,6 @@
                 // 로딩 오버레이 숨기기
                 document.getElementById('overlay').style.display = 'none';
                 document.getElementById('loader').style.display = 'none';
-
                 console.error('Error:', error);
             });
         }
@@ -163,9 +179,14 @@
         <img id="result-image" style="display: none; max-width: 500px;">
     </div>
 
+    <h2 id="download-header" style="display: none;">Processing Completed</h2>
+    <p id="download-message" style="display: none;">Your file is ready for download:</p>
+    <a id="download-link" href="#" style="display: none;">Download Data File</a><br>
+    <a id="download-image-link" href="#" style="display: none;">Download Image File</a>
+
     <!-- 로딩 오버레이 및 스피너 -->
-    <div id="overlay" class="overlay">
-        <div id="loader" class="loader"></div>
+    <div id="overlay" class="overlay" style="display: none;">
+        <div id="loader" class="loader" style="display: none;">Loading...</div>
     </div>
 </body>
 </html>

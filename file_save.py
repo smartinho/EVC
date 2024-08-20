@@ -6,6 +6,7 @@ import pandas as pd
 import dataframe
 
 def save_today(df_data, model_name):
+    global file_name
     # 오늘 날짜를 YYYYMMDD 형식으로 얻기
     today_date = datetime.today().strftime('%Y%m%d')
     file_name = model_name + f'_{today_date}.xlsx'

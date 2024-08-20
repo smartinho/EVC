@@ -10,6 +10,8 @@ app.secret_key = 'your_secret_key'  # Flask의 세션을 위한 비밀키 설정
 
 # 그림 파일을 저장할 디렉토리 설정
 IMAGE_FOLDER = '.'
+DOWNLOAD_FOLDER = '.'  # 다운로드 폴더 경로 설정
+app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 
 @app.route('/')
 def index():
@@ -34,8 +36,6 @@ def submit():
         dataframe.dataframe_read(file_stream) # 정렬 갯수 파일
         file_save.tbd_cost(file_stream) # 미정단가 정리
         
-        print("Current Working Directory:", os.getcwd())
-        
         # 저장된 이미지 불러오기
         today_date = datetime.today().strftime('%Y%m%d')
         image_filename = f"{dataframe.model_name}_BOM_Cost_Graph_{today_date}.png"
@@ -45,12 +45,17 @@ def submit():
         if not os.path.isfile(image_path):
             return jsonify({'result': 'Error', 'message': 'File not saved'}), 500
 
+        # submit 완료 후 process_data 함수 호출
+        filename = process_data()
+
         return jsonify({
             'result': 'Success',
             'html_table': dataframe.html_table,
             'html_table_tbd': file_save.html_table_tbd,
             'html_UIT_table': dataframe.html_UIT_table,
-            'image_url': url_for('uploaded_file', filename=image_filename)
+            'image_url': url_for('uploaded_file', filename=image_filename),
+            'filename': filename,  # 다운로드 링크에 사용할 파일명 반환
+            'image_filename': image_filename  # 이미지 파일명도 반환
         })
     except Exception as e:
         import traceback
@@ -60,6 +65,19 @@ def submit():
 @app.route('/images/<filename>')
 def uploaded_file(filename):
     return send_from_directory(IMAGE_FOLDER, filename)
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config['DOWNLOAD_FOLDER'], filename, as_attachment=True)
+
+@app.route('/download_image/<filename>')
+def download_image(filename):
+    return send_from_directory(IMAGE_FOLDER, filename, as_attachment=True)
+
+@app.route('/process', methods=['POST'])
+def process_data():
+    filename = file_save.file_name
+    return filename
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000/")
