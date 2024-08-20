@@ -4,19 +4,38 @@ from openpyxl.styles import PatternFill, Border, Font, Alignment, Side
 from openpyxl.utils import get_column_letter
 import pandas as pd
 import dataframe
+import os
+from pathlib import Path
 
+def directory():
+    home = str(Path.home())
+    # 다운로드 폴더 경로를 만듭니다.
+    download_folder = os.path.join(home, 'Downloads')
+    return download_folder
+
+def root_path(download_folder, file_name):
+    # 파일 전체 경로를 만듭니다.
+    global file_path
+    file_path = os.path.join(download_folder, file_name)
+    return file_path
+    
 def save_today(df_data, model_name):
+    download_folder = directory()
+    
     # 오늘 날짜를 YYYYMMDD 형식으로 얻기
     today_date = datetime.today().strftime('%Y%m%d')
     file_name = model_name + f'_{today_date}.xlsx'
     sheet_name = file_name[:-5]
 
-    # 데이터프레임을 엑셀 파일로 저장
-    df_data.to_excel(file_name, sheet_name = sheet_name, index=False)
-    return file_name
+    file_path = root_path(download_folder, file_name)
+ 
+    # 데이터프레임을 엑셀 파일로 저장합니다.
+    df_data.to_excel(file_path, sheet_name = sheet_name, index=False)
+        
+    return file_path
 
-def auto_fit_columns(file_name):
-    wb = openpyxl.load_workbook(file_name)
+def auto_fit_columns(file_path):
+    wb = openpyxl.load_workbook(file_path)
 
     # 숫자 형식의 셀에 천 단위 쉼표 추가
     for sheet_name in wb.sheetnames:
@@ -55,7 +74,7 @@ def auto_fit_columns(file_name):
             cell_value = f"환율[$] : {dataframe.rounded_usd_exchange_rate}원"
             ws['G1'] = cell_value
 
-    wb.save(file_name)
+    wb.save(file_path)
 
 def apply_formatting(ws):
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
@@ -138,11 +157,11 @@ def tbd_cost(selected_file):
                 red_rows.append(row)
                 break
 
-    today_date = datetime.today().strftime('%Y%m%d')
-    target_file = dataframe.model_name + f'_{today_date}.xlsx'
+    # today_date = datetime.today().strftime('%Y%m%d')
+    # target_file = dataframe.model_name + f'_{today_date}.xlsx'
     target_sheet_name = '미정단가'
 
-    target_wb = openpyxl.load_workbook(target_file)
+    target_wb = openpyxl.load_workbook(file_path)
     if target_sheet_name in target_wb.sheetnames:
         del target_wb[target_sheet_name]
 
@@ -167,16 +186,16 @@ def tbd_cost(selected_file):
     for col in columns_to_delete:
         target_ws.delete_cols(col, amount=1)
 
-    target_wb.save(target_file)
+    target_wb.save(file_path)
 
-    df_excel = pd.read_excel(target_file, sheet_name='미정단가', header=0)
+    df_excel = pd.read_excel(file_path, sheet_name='미정단가', header=0)
     df_excel.columns = df.columns.tolist()
     # df_excel = df_excel[['Part No', 'Desc.', 'Spec.', 'Exchange Rate(USD)']]
     count = 1
     sorted_df, other_info = dataframe.sort_col(df_excel, count)
     df_excel_sorted = sorted_df
 
-    with pd.ExcelWriter(target_file, engine='openpyxl', mode='a') as writer:
+    with pd.ExcelWriter(file_path, engine='openpyxl', mode='a') as writer:
         writer.book.remove(writer.book[target_sheet_name])
         df_excel_sorted.to_excel(writer, sheet_name=target_sheet_name, index=False)
     
@@ -186,5 +205,5 @@ def tbd_cost(selected_file):
     global html_table_tbd
     html_table_tbd = df_excel_sorted.to_html(classes='table table-striped', index=False)
 
-    auto_fit_columns(target_file)
+    auto_fit_columns(file_path)
 
