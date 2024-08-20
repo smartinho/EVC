@@ -114,6 +114,9 @@
                     const tableContainer2 = document.getElementById('tbd-table');
                     tableContainer2.innerHTML = data.html_table_tbd;
 
+                    const tableContainer3 = document.getElementById('html_UIT_table');
+                    tableContainer3.innerHTML = data.html_UIT_table;
+
                     // 이미지 표시
                     const img = document.getElementById('result-image');
                     img.src = data.image_url;
@@ -152,6 +155,8 @@
     <div id="dataframe-table" class="table-container"></div>
     <h3> ● 미정단가</h3>
     <div id="tbd-table" class="table-container"></div>
+    <h3> ● 임가공비</h3>
+    <div id="html_UIT_table" class="table-container"></div>
     <hr>
     <h2>2. 그래프</h2>
     <div class="container">

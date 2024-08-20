@@ -34,6 +34,8 @@ def submit():
         dataframe.dataframe_read(file_stream) # 정렬 갯수 파일
         file_save.tbd_cost(file_stream) # 미정단가 정리
         
+        print("Current Working Directory:", os.getcwd())
+        
         # 저장된 이미지 불러오기
         today_date = datetime.today().strftime('%Y%m%d')
         image_filename = f"{dataframe.model_name}_BOM_Cost_Graph_{today_date}.png"
@@ -47,6 +49,7 @@ def submit():
             'result': 'Success',
             'html_table': dataframe.html_table,
             'html_table_tbd': file_save.html_table_tbd,
+            'html_UIT_table': dataframe.html_UIT_table,
             'image_url': url_for('uploaded_file', filename=image_filename)
         })
     except Exception as e:

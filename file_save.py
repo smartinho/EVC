@@ -54,7 +54,7 @@ def auto_fit_columns(file_name):
         if not sheet_name == '미정단가':
             cell_value = f"환율[$] : {dataframe.rounded_usd_exchange_rate}원"
             ws['G1'] = cell_value
-
+    
     wb.save(file_name)
 
 def apply_formatting(ws):

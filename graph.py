@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import matplotlib
 from datetime import datetime
-import dataframe
+import dataframe, file_save
+import os
+from pathlib import Path
 
 matplotlib.rcParams['font.family'] = 'Malgun Gothic'
 matplotlib.rcParams['font.size'] = 20
@@ -48,6 +50,8 @@ def stack_graph(df2, df3):
     plt.axis('off')
     
     today_date = datetime.today().strftime('%Y%m%d')
-    plt.savefig(dataframe.model_name +'_BOM_Cost_Graph_'+ f'{today_date}.png')
+    file_name = dataframe.model_name +'_BOM_Cost_Graph_'+ f'{today_date}.png'
+    
+    plt.savefig(file_name)
     plt.close()
 
