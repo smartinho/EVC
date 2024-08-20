@@ -34,6 +34,8 @@ def submit():
         dataframe.dataframe_read(file_stream) # 정렬 갯수 파일
         file_save.tbd_cost(file_stream) # 미정단가 정리
         
+        print("Current Working Directory:", os.getcwd())
+        
         # 저장된 이미지 불러오기
         today_date = datetime.today().strftime('%Y%m%d')
         image_filename = f"{dataframe.model_name}_BOM_Cost_Graph_{today_date}.png"

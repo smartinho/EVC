@@ -49,15 +49,9 @@ def stack_graph(df2, df3):
         
     plt.axis('off')
     
-    # 현재 사용자의 홈 디렉토리 경로를 가져옵니다.
-    home = str(Path.home())
-    # 다운로드 폴더 경로를 만듭니다.
-    download_folder = os.path.join(home, 'Downloads')
-    
     today_date = datetime.today().strftime('%Y%m%d')
     file_name = dataframe.model_name +'_BOM_Cost_Graph_'+ f'{today_date}.png'
-    file_graph = os.path.join(download_folder, file_name)
     
-    plt.savefig(file_graph)
+    plt.savefig(file_name)
     plt.close()
 
